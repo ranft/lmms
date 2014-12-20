@@ -1765,9 +1765,9 @@ void PianoRoll::mousePressEvent( QMouseEvent * _me )
 				}
 
 				Note* currentNote = *it;
-				m_lastNotePanning = ( *it )->getPanning();
-				m_lastNoteVolume = ( *it )->getVolume();
-				m_lenOfNewNotes = ( *it )->length();
+				m_lastNotePanning = currentNote->getPanning();
+				m_lastNoteVolume = currentNote->getVolume();
+				m_lenOfNewNotes = currentNote->length();
 
 				// remember which key and tick we started with
 				m_mouseDownKey = m_startKey;
