@@ -155,7 +155,6 @@ PianoRoll::PianoRoll() :
 	m_pattern( NULL ),
 	m_currentPosition(),
 	m_recording( false ),
-	m_currentNote( NULL ),
 	m_action( ActionNone ),
 	m_noteEditMode( NoteEditVolume ),
 	m_moveBoundaryLeft( 0 ),
@@ -809,7 +808,6 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 	// set new data
 	m_pattern = newPattern;
 	m_currentPosition = 0;
-	m_currentNote = NULL;
 	m_startKey = INITIAL_START_KEY;
 
 	if( hasValidPattern() == false )
@@ -1766,7 +1764,7 @@ void PianoRoll::mousePressEvent( QMouseEvent * _me )
 
 				}
 
-				m_currentNote = *it;
+				Note* currentNote = *it;
 				m_lastNotePanning = ( *it )->getPanning();
 				m_lastNoteVolume = ( *it )->getVolume();
 				m_lenOfNewNotes = ( *it )->length();
@@ -1818,21 +1816,21 @@ void PianoRoll::mousePressEvent( QMouseEvent * _me )
 
 				// if clicked on an unselected note, remove selection
 				// and select that new note
-				if( ! m_currentNote->selected() )
+				if( ! currentNote->selected() )
 				{
 					clearSelectedNotes();
-					m_currentNote->setSelected( true );
-					m_moveBoundaryLeft = m_currentNote->pos().getTicks();
-					m_moveBoundaryRight = m_currentNote->pos() + m_currentNote->length();
-					m_moveBoundaryBottom = m_currentNote->key();
-					m_moveBoundaryTop = m_currentNote->key();
+					currentNote->setSelected( true );
+					m_moveBoundaryLeft = currentNote->pos().getTicks();
+					m_moveBoundaryRight = currentNote->pos() + currentNote->length();
+					m_moveBoundaryBottom = currentNote->key();
+					m_moveBoundaryTop = currentNote->key();
 				}
 
 
 				// clicked at the "tail" of the note?
 				if( pos_ticks*m_ppt/MidiTime::ticksPerTact() >
-					( m_currentNote->pos() + m_currentNote->length() )*m_ppt/ MidiTime::ticksPerTact() - RESIZE_AREA_WIDTH &&
-						m_currentNote->length() > 0 )
+					( currentNote->pos() + currentNote->length() )*m_ppt/ MidiTime::ticksPerTact() - RESIZE_AREA_WIDTH &&
+						currentNote->length() > 0 )
 				{
 					m_pattern->addJournalCheckPoint();
 					// then resize the note
@@ -1891,7 +1889,7 @@ void PianoRoll::mousePressEvent( QMouseEvent * _me )
 					}
 
 					// play the note
-					testPlayNote( m_currentNote );
+					testPlayNote( currentNote );
 				}
 
 				Engine::getSong()->setModified();
@@ -2265,8 +2263,6 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * _me )
 		// stop playing keys that we let go of
 		m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( m_lastKey );
 	}
-
-	m_currentNote = NULL;
 
 	m_action = ActionNone;
 

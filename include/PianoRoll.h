@@ -302,7 +302,6 @@ private:
 	bool m_recording;
 	QList<Note> m_recordingNotes;
 
-	Note * m_currentNote;
 	actions m_action;
 	noteEditMode m_noteEditMode;
 
